@@ -142,7 +142,7 @@ const connectRTC = async (ws, req) => {
 							return;
 						}
 					}
-					
+
 					// 设置当前用户通话状态
 					LoginRooms[username].status = true;
 					// 发送邀请 —— 利用 LoginRooms 存储的 ws 连接实例向在线且空闲的被邀请人发送邀请

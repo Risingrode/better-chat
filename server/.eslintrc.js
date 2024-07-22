@@ -20,7 +20,7 @@ module.exports = {
 		ecmaVersion: 'latest'
 	},
 	rules: {
-		'no-console': 'error',
+		'no-console': 'off',
 		eqeqeq: 'error',
 		'prefer-const': [
 			'error',

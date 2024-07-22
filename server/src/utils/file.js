@@ -37,7 +37,6 @@ const base64ToImage = base64String => {
 	return filePath;
 };
 
-
 module.exports = {
 	generateRandomString,
 	notExitCreate,
