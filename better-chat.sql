@@ -14,6 +14,10 @@
  Date: 07/05/2024 22:04:47
 */
 
+
+create database `better-chat`;
+use `better-chat`;
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
