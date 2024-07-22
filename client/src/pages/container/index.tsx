@@ -23,14 +23,14 @@ import { handleLogout } from '@/utils/logout';
 import { clearSessionStorage, userStorage } from '@/utils/storage';
 
 const Container = () => {
-	const showMessage = useShowMessage();
-	const navigate = useNavigate();
-	const user = JSON.parse(userStorage.getItem());
-	const [currentIcon, setCurrentIcon] = useState<string>('icon-message');
-	const [openForgetModal, setForgetModal] = useState(false);
-	const [openInfoModal, setInfoModal] = useState(false);
-	const [openAudioModal, setAudioModal] = useState(false);
-	const [openVideoModal, setVideoModal] = useState(false);
+	const showMessage = useShowMessage();// 弹窗提示
+	const navigate = useNavigate(); // 路由跳转
+	const user = JSON.parse(userStorage.getItem()); // 用户信息
+	const [currentIcon, setCurrentIcon] = useState<string>('icon-message'); // 当前选中的图标
+	const [openForgetModal, setForgetModal] = useState(false); // 修改密码弹窗
+	const [openInfoModal, setInfoModal] = useState(false); 		// 修改信息弹窗
+	const [openAudioModal, setAudioModal] = useState(false); 	// 音频通话弹窗
+	const [openVideoModal, setVideoModal] = useState(false); 	// 视频通话弹窗
 	const socket = useRef<WebSocket | null>(null); // websocket 实例
 	const addressBookRef = useRef<IAddressBookRef>(null); // 通讯录组件实例
 	const chatRef = useRef<IChatRef>(null); // 聊天列表组件实例
@@ -66,7 +66,7 @@ const Container = () => {
 		try {
 			const res = await handleLogout(user);
 			if (res.code === HttpStatus.SUCCESS) {
-				clearSessionStorage();
+				clearSessionStorage(); // 清楚本次会话·
 				showMessage('success', '退出成功');
 				// 关闭 websocket 连接
 				if (socket.current !== null) {
@@ -121,12 +121,12 @@ const Container = () => {
 	// 进入到主页面时建立一个 websocket 连接
 	const initSocket = () => {
 		const ws = new WebSocket(`${wsBaseURL}/auth/user_channel?username=${user.username}`);
-		ws.onmessage = e => {
+		ws.onmessage = e => { // 监听消息
 			const message = JSON.parse(e.data);
 			switch (message.name) {
 				case 'friendList':
 					// 重新加载好友列表
-					addressBookRef.current?.refreshFriendList();
+					addressBookRef.current?.refreshFriendList(); // ?. 可选链操作符 该属性不存在时也不会报错 
 					break;
 				case 'groupChatList':
 					// 重新加载群聊列表
@@ -177,6 +177,8 @@ const Container = () => {
 							<ImageLoad src={user.avatar} />
 						</div>
 					</Popover>
+					{/* 这个是菜单 */}
+					{/* TODO ：目前主页面只实现了三个功能，以后有空自己添加 */}
 					<div className={styles.iconList}>
 						<ul className={styles.topIcons}>
 							{MenuIconList.slice(0, 5).map(item => {

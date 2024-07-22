@@ -26,7 +26,7 @@ const checkAndModifyStatistics = async room => {
 // 将处理后的消息写入数据库和发送给房间内的所有人(type 表示私聊或者群聊，room 表示房间号，msg 为写入数据库的消息，message 为发送出去的消息)
 const writeAndSend = async (type, room, msg, message) => {
 	// 将处理后的消息写入数据库和发送给房间内的所有人
-	// 这里的处理存在纰漏，因为群聊时，message.receiver_id 是群聊 id，不是用户 id，所以无法判断对方是否在房间，且群聊信息存在很多个接收者，但消息表的结构设计导致一条消息只能有一个接收者，所以这里的处理是不完善的
+	// todo 这里的处理存在纰漏，因为群聊时，message.receiver_id 是群聊 id，不是用户 id，所以无法判断对方是否在房间，且群聊信息存在很多个接收者，但消息表的结构设计导致一条消息只能有一个接收者，所以这里的处理是不完善的
 	// 因此默认群聊消息都是已读状态
 	// 写入数据库
 	if (type === 'group' || (type === 'private' && ChatRooms[room][message.receiver_id])) {
@@ -138,23 +138,23 @@ const getChatList = async (req, res) => {
 		const sql_group = `
 			SELECT 
 				gc.id AS receiver_id,
-        avatar,
-        name,
-        gc.room,
-        msg_sta.updated_at
+				avatar,
+				name,
+				gc.room,
+				msg_sta.updated_at
 			FROM group_chat AS gc,
 				(SELECT *
 				FROM group_members
 				WHERE user_id = ?
 				) AS gm, message_statistics AS msg_sta
-			WHERE 
+			WHERE
 				gc.id = gm.group_id AND gc.room = msg_sta.room
 			ORDER BY msg_sta.updated_at DESC;
 		`;
 		const results_group = await Query(sql_group, [id]);
 		for (const index in results_group) {
 			const item = results_group[index];
-			// 获取群聊未读消息的数量 (因为是群聊消息, 此时的 receiver_id 为 group_id，因此目前无法处理，先设置为 0)
+			// 获取群聊未读消息的数量 (因为是群聊消息, 此时的 receiver_id 为 group_id ，因此目前无法处理，先设置为 0)
 			results_group[index].unreadCount = 0;
 			// 获取群聊最后一条消息
 			const sql = `SELECT content as lastMessage, media_type as type FROM message WHERE room = ? ORDER BY created_at DESC LIMIT 1`;
@@ -239,14 +239,14 @@ const connectChat = async (ws, req) => {
 				ON u.id = m.sender_id
 				LEFT JOIN group_members AS gm
 				ON gm.group_id = ?
-        AND user_id = u.id
+        		AND user_id = u.id
 				ORDER BY created_at ASC
 		`;
 			results_msg = await Query(sql_group, [room, type, id]);
 		} else {
 			const sql_private = `
 			SELECT m.*,
-        u.avatar
+        	u.avatar
 			FROM 
 				(SELECT 
 					sender_id,

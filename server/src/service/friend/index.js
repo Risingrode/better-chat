@@ -16,6 +16,7 @@ const getFriendByGroup = async group_id => {
 		throw new Error('查询失败');
 	}
 };
+
 // 查询某个用户下的所有好友（数组平铺）
 const getFriendByUser = async user_id => {
 	try {
@@ -32,6 +33,7 @@ const getFriendByUser = async user_id => {
 		throw new Error('查询失败');
 	}
 };
+
 // 添加好友
 const addFriendRecord = async friend_info => {
 	try {
@@ -50,7 +52,7 @@ const addFriendRecord = async friend_info => {
 /**
  * 查询用户的基本逻辑：
  * 1. 查询用户表, 模糊查询
- * 2. 判断查询出来的数据中, 判断是否存在已经好友的现象
+ * 2. 判断查询出来的数据中, 判断是否存在已经是好友的现象
  * 3. 筛选出已经是好友的和不是好友的，非好友的才能添加
  */
 const searchUser = async (req, res) => {
@@ -95,6 +97,7 @@ const searchUser = async (req, res) => {
 		return RespError(res, CommonErrStatus.SERVER_ERR);
 	}
 };
+
 /**
  * 添加好友的基本逻辑：
  * 1. 首先将好友添加到自己的好友列表中

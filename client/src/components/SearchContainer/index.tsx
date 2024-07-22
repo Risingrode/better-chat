@@ -29,9 +29,11 @@ const SearchContainer = () => {
 	return (
 		<>
 			<div className={styles.searchContainer}>
+				{/* TODO：这里的搜索功能没有实现 */}
 				<div className={styles.searchBox}>
 					<Input size="small" placeholder="搜索" prefix={<SearchOutlined />} />
 				</div>
+				{/* 这是那个添加按钮 */}
 				<Tooltip
 					placement="bottomLeft"
 					title={addContent}
@@ -39,6 +41,7 @@ const SearchContainer = () => {
 					overlayClassName="addContent"
 				>
 					<div className={styles.addBox}>
+						{/* 这个是加号图标 */}
 						<PlusOutlined />
 					</div>
 				</Tooltip>

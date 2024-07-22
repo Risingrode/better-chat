@@ -32,6 +32,7 @@ export class Storage<T> implements ISessionStorage<T> {
 				: this.defaultValue;
 		}
 	}
+	
 
 	removeItem() {
 		sessionStorage.removeItem(this.key);

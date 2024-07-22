@@ -23,6 +23,7 @@ const rememberUser = async (info: IUserInfo) => {
 		localStorage.setItem('authToken', authToken);
 	}
 };
+
 // 获取本地存储的用户信息
 const getUserInfo = async () => {
 	const userInfo = localStorage.getItem('userInfo');

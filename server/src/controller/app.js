@@ -18,7 +18,6 @@ const cors = (req, res, next) => {
 	// 跨域允许的请求方式
 	res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS');
 	res.header('Content-Type', 'application/json;charset=utf-8');
-
 	if (req.method.toLowerCase() === 'options')
 		res.sendStatus(200); // 让 options 尝试请求快速结束
 	else next();

@@ -13,5 +13,10 @@ export default defineConfig({
 		alias: {
 			'@': path.resolve(__dirname, './src')
 		}
-	}
+	},
+	// define: {
+	// 	'process.env': { // 定义开发环境
+	// 	NODE_ENV: JSON.stringify(process.env.NODE_ENV)
+	// 	}
+	// }
 });

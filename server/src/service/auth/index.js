@@ -8,9 +8,13 @@ const { RespData, RespSuccess, RespError } = require('../../utils/resp');
 const { secretKey } = require('../../utils/authenticate');
 const { NotificationUser } = require('../../utils/notification');
 const { Query } = require('../../utils/query');
+const { log } = require('console');
 
+// 存入数据库1中的用户 token 信息
+// TODO 这个数据库可以搞个全局变量
 const better_chat = new Redis({
-    password: '123456'
+    password: '123456',
+    db: 1
 });
 
 /**
@@ -26,7 +30,7 @@ const login = async (req, res) => {
     }
     try {
         const sql = `SELECT * FROM user WHERE username = ?`;
-        const results = await Query(sql, [username]);
+        const results = await Query(sql, [username]); // 用户名加个中括号什么意思??   为了防止 sql 注入
         if (results.length !== 0) {
             // 1. 获取到用户信息
             const payload = {
@@ -45,7 +49,7 @@ const login = async (req, res) => {
             if (hash !== payload.password) {
                 return RespError(res, AuthErrStatus.USER_OR_PASS_ERR);
             }
-            // 4. 生成 jwt，之后 payload 会携带在请求头的 req.user 中（前提是通过了中间件）
+            // 4. 生成 jwt，之后 payload 会携带在请求头的 req.user 中(前提是通过了中间件)
             const token = jwt.sign(payload, secretKey);
             const data = {
                 token: token,
@@ -71,6 +75,7 @@ const login = async (req, res) => {
             await Query(sql, ['online', username]);
             // 6. 保存 Token 到 Redis 缓存中
             await better_chat.set(`token:${payload.username}`, token, 'EX', 60 * 60 * 24 * 14); // 有效期为 14 天
+            log(`用户${payload.username}登录成功,token 已保存到 Redis 缓存中`);
             return RespData(res, data);
         } else {
             return RespError(res, AuthErrStatus.USER_OR_PASS_ERR);
@@ -111,7 +116,7 @@ const logout = async (req, res) => {
  */
 const register = async (req, res) => {
     const { username, password, phone, avatar } = req.body;
-    if (!(username && password && phone)) {
+    if (!(username && password && phone)) { // 确保所有必要的请求参数都存在
         return RespError(res, CommonErrStatus.PARAM_ERR);
     }
     try {
@@ -179,6 +184,7 @@ const register = async (req, res) => {
  */
 const forgetPassword = async (req, res) => {
     const { username, phone, password } = req.body;
+
     if (!(username && phone && password)) {
         return RespError(res, CommonErrStatus.PARAM_ERR);
     }
@@ -196,6 +202,7 @@ const forgetPassword = async (req, res) => {
         const sql_set = `UPDATE user SET PASSWORD = ? WHERE username = ?`;
         const results_set = await Query(sql_set, [hash, username]);
         if (results_set.affectedRows === 1) {
+            log(`用户${username}手机号是${phone}修改密码为${password}`);
             return RespSuccess(res);
         }
     } catch {
@@ -217,6 +224,7 @@ const updateInfo = async (req, res) => {
         // 判断手机号是否已经注册
         const sql_check = `SELECT * FROM user WHERE phone = ?`;
         const results_check = await Query(sql_check, [phone]);
+        log(results_check);
         if (results_check.length !== 0) {
             return RespError(res, AuthErrStatus.PHONE_EXIT_ERR);
         }
@@ -245,8 +253,8 @@ const updateInfo = async (req, res) => {
             const token = jwt.sign(payload, secretKey);
             // 刷新 redis 中的 token
             await better_chat.set(`token:${payload.username}`, token, 'EX', 60 * 60 * 24 * 14); // 有效期为 14 天
-            // 通知好友刷新本人信息
 
+            // 通知好友刷新本人信息
             const data = {
                 token: token,
                 info: {
@@ -268,6 +276,7 @@ const updateInfo = async (req, res) => {
     }
 };
 /**
+ * todo 这里不太会  LoginRooms 不理解
  * 登录成功后初始化用户的通知管道（websocket连接信息全局存储）, 用于通知用户好友列表的更新
  */
 const initUserNotification = async (ws, req) => {
@@ -278,7 +287,7 @@ const initUserNotification = async (ws, req) => {
         ws: ws,
         status: false // 表示用户是否正在音视频通话中
     };
-    // 通知当前登录的所有好友进行好友列表更新（目前处理方式是通知所有已登录用户，后续可以优化）
+    // todo 通知当前登录的所有好友进行好友列表更新（目前处理方式是通知所有已登录用户，后续可以优化）
     for (const username in LoginRooms) {
         if (username === curUsername) continue;
         NotificationUser({ receiver_username: username, name: 'friendList' });

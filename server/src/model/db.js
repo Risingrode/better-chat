@@ -10,17 +10,24 @@ let host = '127.0.0.1'; // 数据库的 IP 地址
 let port = 3306; // 端口
 let user = 'root'; // 登录数据库的账号
 let password = '111111'; // 登录数据库的密码
-let database = 'betterChat'; // 指定要操作哪个数据库
+let database = 'better-Chat'; // 指定要操作哪个数据库
 // 如果存在配置文件，则读取配置文件中的配置
 const configPath = path.join(process.cwd(), './config.json');
-if (fs.existsSync(configPath)) {
-    const res = JSON.parse(fs.readFileSync(configPath));
-    host = res.host;
-    port = res.port;
-    user = res.user;
-    password = res.password;
-    database = res.database;
-}
+
+(() => {
+    if (fs.existsSync(configPath)) {
+        const res = JSON.parse(fs.readFileSync(configPath));
+        host = res.host;
+        port = res.port;
+        user = res.user;
+        password = res.password;
+        database = res.database;
+    }
+    else {
+        console.log('cheack config.json!!!');
+    }
+})();
+
 
 /**
  * 2. 建立与 MySQL 数据库的连接关系
@@ -203,6 +210,7 @@ db.query('select 1', error => {
     // eslint-disable-next-line no-console
     console.log('MySQL 连接成功');
 });
+
 
 /**
  * 5、将连接好的数据库对象向外导出, 供外界使用

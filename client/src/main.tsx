@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import '@/assets/styles/global.less';
 import RouteRender from '@/router';
 
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<BrowserRouter>
 		<ConfigProvider

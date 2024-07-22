@@ -37,7 +37,7 @@ const base64ToImage = base64String => {
 	return filePath;
 };
 
-// 判断指定路径是否存在, 不存在则创建
+
 module.exports = {
 	generateRandomString,
 	notExitCreate,
